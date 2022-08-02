@@ -1,0 +1,20 @@
+pipeline{
+  agent any
+  stages {
+    stage('Build') {
+      steps {
+        '''example sh 'echo "Hello World" '''
+        dockerImage = docker.build registry + ":$BUILD_NUMBER"
+        }
+    }
+    stage('Deploy') {
+      steps{
+            script{
+                docker.withRegistry("https://" + registry, "ecr:eu-central-1:" + registryCredential) {
+                    dockerImage.push()
+                    }
+                 }
+               }
+             }
+   }
+}
